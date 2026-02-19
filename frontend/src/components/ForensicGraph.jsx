@@ -99,81 +99,78 @@ export default function ForensicGraph({ elements }) {
   const cyRef = useRef(null);
   const [selectedNode, setSelectedNode] = useState(null);
 
-  // High-Density Graph Aesthetic
+  // Ultra-Performance Stylesheet with Arrows Restored
   const stylesheet = [
     {
-      // DEFAULT SAFE NODE (Faded into the background)
+      // SAFE NODE
       selector: 'node',
       style: {
-        'background-color': 'rgba(255, 255, 255, 0.05)',
-        'color': '#555566',
-        'font-family': 'Inter, sans-serif',
-        'font-size': '8px',
-        'border-width': 1,
-        'border-color': 'rgba(255, 255, 255, 0.1)',
-        'width': 12, // Tiny
-        'height': 12,
-        'label': '', // Hide labels by default on safe nodes to reduce clutter
+        'background-color': '#00FFA3',
+        'opacity': 0.6,
+        'width': 10,
+        'height': 10,
+        'label': '', 
+        'overlay-opacity': 0
       }
     },
     {
-      // SAFE NODE HOVER STATE
+      // SAFE NODE HOVER
       selector: 'node:active',
       style: {
         'label': 'data(id)',
-        'background-color': '#00f0ff',
-        'width': 20,
-        'height': 20,
+        'width': 15,
+        'height': 15,
+        'opacity': 1,
+        'color': '#00FFA3',
+        'font-family': 'monospace',
+        'font-size': '12px',
+        'z-index': 50
       }
     },
     {
-      // FRAUDULENT NODE (Massive and Glowing)
+      // FRAUDULENT NODE
       selector: 'node[?is_suspicious]',
       style: {
         'background-color': '#FF2A4D', 
         'border-color': '#ffffff',
-        'border-width': 2,
+        'border-width': 1,
+        'opacity': 1,
         'color': '#FF2A4D',
         'font-family': 'monospace',
-        'font-size': '14px',
+        'font-size': '12px',
         'font-weight': 'bold',
         'text-valign': 'bottom',
-        'text-margin-y': 6,
-        'label': 'data(id)', // Always show labels for fraud
-        'width': 40,
-        'height': 40,
-        'shadow-blur': 30,
-        'shadow-color': '#FF2A4D',
-        'shadow-opacity': 1,
-        'z-index': 100 // Force to top
+        'text-margin-y': 4,
+        'label': 'data(id)',
+        'width': 25,
+        'height': 25,
+        'z-index': 100
       }
     },
     {
-      // DEFAULT EDGE (Faint and thin)
+      // RESTORED ARROWS WITH HIGH PERFORMANCE
       selector: 'edge',
       style: {
-        'width': 0.5,
-        'line-color': 'rgba(255, 255, 255, 0.05)',
-        'target-arrow-color': 'rgba(255, 255, 255, 0.05)',
+        'width': 1,
+        'line-color': '#00FFA3',
+        'opacity': 0.2, // Slightly more visible
+        'curve-style': 'straight', // Straight is ~10x faster than bezier and supports arrows
         'target-arrow-shape': 'triangle',
-        'curve-style': 'bezier',
-        'arrow-scale': 0.5,
+        'target-arrow-color': '#00FFA3',
+        'arrow-scale': 0.6
       }
     },
     {
-      // FRAUDULENT EDGE (Glowing Marching Ants)
-      selector: '.animated-flow',
+      // HIGHLIGHTED FRAUD EDGES
+      selector: '.fraud-edge',
       style: {
-        'line-style': 'dashed',
-        'line-dash-pattern': [8, 6],
+        'width': 2.5,
         'line-color': '#FF2A4D',
         'target-arrow-color': '#FF2A4D',
-        'width': 3,
-        'arrow-scale': 1.5,
+        'opacity': 1,
         'z-index': 99,
-        'shadow-blur': 15,
-        'shadow-color': '#FF2A4D',
-        'shadow-opacity': 0.8
+        'line-style': 'dashed',
+        'arrow-scale': 1.2
       }
     }
   ];
@@ -185,46 +182,39 @@ export default function ForensicGraph({ elements }) {
     cy.on('tap', 'node', (evt) => setSelectedNode(evt.target.data()));
     cy.on('tap', (evt) => { if (evt.target === cy) setSelectedNode(null); });
 
-    // Find edges connecting suspicious nodes and highlight them
+    // Find edges connecting suspicious nodes to highlight them in red
     const suspiciousEdges = cy.edges().filter(ele => {
       return ele.source().data('is_suspicious') && ele.target().data('is_suspicious');
     });
 
-    suspiciousEdges.addClass('animated-flow');
+    suspiciousEdges.addClass('fraud-edge');
 
-    // Create the flowing money effect
-    let offset = 24;
-    const animationInterval = setInterval(() => {
-      offset -= 1;
-      if (offset <= 0) offset = 24;
-      cy.style().selector('.animated-flow').style({
-        'line-dash-offset': offset
-      }).update();
-    }, 40);
-
-    return () => clearInterval(animationInterval);
   }, [elements]);
+
+  // ENGINE OPTIMIZATION: If data > 2000 rows, use instant grid layout to prevent freezing
+  const isMassiveData = elements && elements.length > 2000;
 
   return (
     <div className="w-full h-full relative bg-[#020205] rounded-lg overflow-hidden">
       <CytoscapeComponent
         elements={elements}
         stylesheet={stylesheet}
-        // Switch to Concentric for a high-density "radar" look
         layout={{ 
-          name: 'concentric',
+          name: isMassiveData ? 'grid' : 'concentric', // Dynamic layout switching
           fit: true,
-          padding: 50,
-          minNodeSpacing: 30,
+          padding: 40,
+          animate: false, // Critical for preventing lag
           concentric: function(node) {
-            // Push suspicious nodes to the center of the screen
-            return node.data('is_suspicious') ? 100 : 10;
+            return node.data('is_suspicious') ? 100 : 1; // Pushes fraud to center
           },
-          levelWidth: function(nodes) { return 10; },
-          animate: true,
-          animationDuration: 1500,
-          animationEasing: 'ease-out-quint'
+          levelWidth: () => 1
         }}
+        // HARDCORE PERFORMANCE FLAGS
+        textureOnViewport={true} // Turns graph to an image while dragging
+        hideEdgesOnPan={true}    // Hides lines while panning
+        hideLabelsOnPan={true}   // Hides labels while panning
+        wheelSensitivity={0.15}  // Smoother zooming
+        
         style={{ width: '100%', height: '100%' }}
         cy={(cy) => { cyRef.current = cy; }}
       />
