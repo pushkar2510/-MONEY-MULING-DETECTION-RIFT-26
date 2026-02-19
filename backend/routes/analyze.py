@@ -41,7 +41,8 @@ def analyze_transactions():
         node_patterns,
         node_ring_map,
         start_time,
-        len(G.nodes)
+        len(G.nodes),
+        G
     )
 
 
