@@ -197,6 +197,8 @@ Dependencies: [frontend/package.json](frontend/package.json)
 
 - Frontend now uses `VITE_API_BASE_URL` for API requests (falls back to relative `/analyze` if unset).
 - Set `VITE_API_BASE_URL` in frontend deployment to your backend origin (example: `https://your-backend.onrender.com`).
+- Backend CORS allowlist is configurable via `FRONTEND_ORIGIN` (single) or `FRONTEND_ORIGINS` (comma-separated).
+- On Render backend, set `FRONTEND_ORIGIN` to your frontend URL (example: `https://your-frontend.onrender.com`).
 - Ensure backend is running before uploading a CSV.
 - For production, consider:
   - stricter error handling and logging
