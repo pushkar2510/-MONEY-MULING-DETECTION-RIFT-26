@@ -140,8 +140,8 @@ Hardware Memory Limits on Massive Graphs: The Cytoscape frontend implements a bi
 Temporal Parsing Assumptions: The backend utilizes Pandas mixed-format parsing. Highly irregular or corrupted timestamp strings may default to Pandas NaT and bypass the 72-hour sliding window check.
 
 9. Team Members
-[Your Name] - Backend Algorithms & Graph Architecture
+   Aditya Yadav - Backend Algorithms & Graph Architecture
 
-[Team Member 2 Name] - Frontend Integration & Visualization
+   Pushkar, Yash, Vinit, Aditya - Frontend Integration & Visualization
 
-[Team Member 3 Name] - Data Preprocessing & Validation
+   Aditya - Data Preprocessing & Validation
